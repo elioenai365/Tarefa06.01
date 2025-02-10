@@ -2,6 +2,7 @@
 #include "hardware/pwm.h"
 
 #define PWM_GPIO 22       // Pino de saída PWM
+#define LED_GPIO 12       // Pino do LED RGB
 #define PWM_FREQ 50       // Frequência desejada (50Hz)
 #define SYSTEM_CLOCK 125000000 // Clock base do Raspberry Pi Pico
 #define TOP_VALUE 65535   // Resolução de 16 bits
@@ -25,15 +26,28 @@ void setup_pwm(uint16_t pulse_width_us) {
     pwm_set_enabled(slice_num, true); // Habilita o PWM
 }
 
+void setup_led() {
+    gpio_init(LED_GPIO);
+    gpio_set_dir(LED_GPIO, GPIO_OUT);
+}
+
+void toggle_led() {
+    static bool led_state = false;
+    led_state = !led_state;
+    gpio_put(LED_GPIO, led_state);
+}
+
 void move_servo_smoothly(uint16_t start, uint16_t end) {
     if (start < end) {
         for (uint16_t pulse = start; pulse <= end; pulse += STEP_US) {
             setup_pwm(pulse);
+            toggle_led();
             sleep_ms(DELAY_MS);
         }
     } else {
         for (uint16_t pulse = start; pulse >= end; pulse -= STEP_US) {
             setup_pwm(pulse);
+            toggle_led();
             sleep_ms(DELAY_MS);
         }
     }
@@ -41,6 +55,7 @@ void move_servo_smoothly(uint16_t start, uint16_t end) {
 
 int main() {
     stdio_init_all();
+    setup_led();
     
     setup_pwm(PULSE_MAX); // Define posição inicial em 180 graus
     sleep_ms(5000); // Aguarda 5 segundos
