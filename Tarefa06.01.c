@@ -29,7 +29,12 @@ int main() {
     setup_pwm(1470); // Define ciclo ativo de 1.470µs (0,0735%) - posição de 90 graus
     sleep_ms(5000); // Aguarda 5 segundos
     
+    setup_pwm(500); // Define ciclo ativo de 500µs (0,025%) - posição de 0 graus
+    sleep_ms(5000); // Aguarda 5 segundos
+    
+    
     while (1) {
         sleep_ms(1000); // Mantém o loop
     }
 }
+
